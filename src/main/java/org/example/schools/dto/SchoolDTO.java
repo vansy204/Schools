@@ -1,57 +1,28 @@
-package com.sample;
+package org.example.schools.dto;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.Data;
+import org.example.schools.entity.SchoolClass;
+import org.example.schools.entity.SchoolDetail;
+import org.example.schools.entity.Staff;
+import org.example.schools.entity.Student;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 
-public class School {
+import java.util.List;
+
+@Data
+public class SchoolDTO {
 
   private long id;
-  private long shoolDetailId;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "shool_detail_id")
+  private SchoolDetail schoolDetail;
   private String phone;
   private String address;
   private String name;
 
 
-  public long getId() {
-    return id;
-  }
-
-  public void setId(long id) {
-    this.id = id;
-  }
-
-
-  public long getShoolDetailId() {
-    return shoolDetailId;
-  }
-
-  public void setShoolDetailId(long shoolDetailId) {
-    this.shoolDetailId = shoolDetailId;
-  }
-
-
-  public String getPhone() {
-    return phone;
-  }
-
-  public void setPhone(String phone) {
-    this.phone = phone;
-  }
-
-
-  public String getAddress() {
-    return address;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
-  }
-
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
 
 }
