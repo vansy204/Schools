@@ -1,12 +1,8 @@
 package org.example.schools.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.example.schools.dto.SchoolClassDTO;
-import org.modelmapper.ModelMapper;
-import org.springframework.context.annotation.Bean;
 
 @Entity
 @Table(name = "School_class")

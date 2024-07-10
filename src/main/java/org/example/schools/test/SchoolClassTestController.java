@@ -8,9 +8,11 @@ import org.example.schools.entity.SchoolClass;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,12 +33,54 @@ public class SchoolClassTestController {
         List<SchoolClass> schoolClassList = schoolClassService.getAllClasses();
         return schoolClassList.stream().map(this::convertToDto).collect(Collectors.toList());
     }
-    @PostMapping("/save")
+    @GetMapping("/getClassByClassName/{className}")
+    public SchoolClassDTO getClassByClassName(@PathVariable String className) {
+        Optional<SchoolClass> schoolClass = schoolClassService.getClassByName(className);
+        return convertToDto(schoolClass.orElse(null));
+    }
+    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public SchoolClassDTO save(@RequestBody SchoolClassDTO  schoolClassDTO) {
+    public ResponseEntity<SchoolClassDTO> save(@RequestBody SchoolClassDTO schoolClassDTO) {
+
         SchoolClass schoolClass = convertToEntity(schoolClassDTO);
         schoolClassService.save(schoolClass);
-        return schoolClassDTO;
+        return ResponseEntity.ok(convertToDto(schoolClass));
+    }
+
+    @PostMapping("/update/{className}")
+    @Transactional
+    public SchoolClass update(@PathVariable String className, @RequestBody SchoolClassDTO schoolClassDTO) throws RuntimeException {
+        Optional<SchoolClass> schoolClass = schoolClassService.getClassByName(className);
+        if(schoolClass.isEmpty()){
+            throw new RuntimeException("School class not found with name: " + className);
+        }
+        SchoolClass schoolClasstoUpdate = schoolClass.get();
+        updateEntityFromDto(schoolClasstoUpdate,schoolClassDTO);
+        schoolClassService.save(schoolClasstoUpdate);
+        return schoolClasstoUpdate;
+    }
+    @DeleteMapping("/delete/{className}")
+    @Transactional
+    public void delete(@PathVariable String className) throws RuntimeException {
+        Optional<SchoolClass> schoolClass = schoolClassService.getClassByName(className);
+        if(schoolClass.isEmpty()){
+            throw new RuntimeException("School class not found with name: " + className);
+        }
+        schoolClassService.delete(schoolClass.get());
+    }
+    public void updateEntityFromDto(SchoolClass schoolClass,SchoolClassDTO schoolClassDTO) {
+        if(schoolClass.getClassRank() != schoolClassDTO.getClassRank() && schoolClassDTO.getClassRank() != 0){
+            schoolClass.setClassRank(schoolClassDTO.getClassRank());
+        }
+        if(schoolClass.getSchoolYear() != schoolClassDTO.getSchoolYear() && schoolClassDTO.getSchoolYear() != null){
+            schoolClass.setSchoolYear(schoolClassDTO.getSchoolYear());
+        }
+        if(schoolClass.getNumberOfClass() != schoolClassDTO.getNumberOfClass() && schoolClassDTO.getNumberOfClass() != 0){
+            schoolClass.setNumberOfClass(schoolClassDTO.getNumberOfClass());
+        }
+        if(schoolClass.getBlock() != schoolClassDTO.getBlock() && schoolClassDTO.getBlock() != 0){
+            schoolClass.setBlock(schoolClassDTO.getBlock());
+        }
     }
     private SchoolClassDTO convertToDto(SchoolClass schoolClass) {
         return modelMapper.map(schoolClass, SchoolClassDTO.class);

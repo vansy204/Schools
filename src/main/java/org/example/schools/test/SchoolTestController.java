@@ -56,6 +56,7 @@ public class SchoolTestController {
         return schoolToUpdate;
     }
     @DeleteMapping("/delete/{id}")
+    @Transactional
     public void delete(@PathVariable Long id) {
         schoolService.deleteSchool(id);
     }
